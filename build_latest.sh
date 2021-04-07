@@ -239,43 +239,43 @@ function build_image() {
 	echo "#####################################################"
 	echo "INFO: docker build --no-cache ${expanded_tags} -f ${dockerfile} ."
 	echo "#####################################################"
-	if [ ! -z "$TARGET_ARCHITECTURE" ]; then
-		echo "using a buildx environment"
-		export DOCKER_CLI_EXPERIMENTAL="enabled"
-		docker buildx create --name mbuilder
-		docker buildx use mbuilder
-		docker buildx inspect --bootstrap
-		# shellcheck disable=SC2086 # ignoring ${tags} due to whitespace problem
-		if ! docker buildx build --platform "$TARGET_ARCHITECTURE" --pull --no-cache ${expanded_tags} -f "${dockerfile}" . ; then
-			echo "#############################################"
-			echo
-			echo "ERROR: Docker build of image: ${expanded_tags} from ${dockerfile} failed."
-			echo
-			echo "#############################################"
-			echo "| ${image_name:0:80}${auto_space_line:0:$((76 - ${#image_name}))} | failure  |" >> ${summary_table_file}
-			echo "+------------------------------------------------------------------------------+----------+" >> ${summary_table_file}
-			if [ "${runtype}" == "test" ]; then
-				cleanup_images
-				cleanup_manifest
-				exit 1
-			fi
-		else
-			if ((SNYK_ENABLED)); then
-			echo "#####################################################"
-			echo "        Scanning with snyk for vulnerabilities       "
-			echo "#####################################################"
-				for i in "${!tags[@]}"
-				do
-					echo "...scanning ${repo}:${tags[$i]}"
-					snyk test --docker "${repo}:${tags[$i]}" --file="${dockerfile}"
-				done
-			fi
-			echo "| ${image_name:0:80}${auto_space_line:0:$((76 - ${#image_name}))} | success  |" >> ${summary_table_file}
-			echo "+------------------------------------------------------------------------------+----------+" >> ${summary_table_file}
-		fi
-
-		docker buildx rm mbuilder
-	else
+#	if [ ! -z "$TARGET_ARCHITECTURE" ]; then
+#		echo "using a buildx environment"
+#		export DOCKER_CLI_EXPERIMENTAL="enabled"
+#		docker buildx create --name mbuilder
+#		docker buildx use mbuilder
+#		docker buildx inspect --bootstrap
+#		# shellcheck disable=SC2086 # ignoring ${tags} due to whitespace problem
+#		if ! docker buildx build --platform "$TARGET_ARCHITECTURE" --pull --no-cache ${expanded_tags} -f "${dockerfile}" . ; then
+#			echo "#############################################"
+#			echo
+#			echo "ERROR: Docker build of image: ${expanded_tags} from ${dockerfile} failed."
+#			echo
+#			echo "#############################################"
+#			echo "| ${image_name:0:80}${auto_space_line:0:$((76 - ${#image_name}))} | failure  |" >> ${summary_table_file}
+#			echo "+------------------------------------------------------------------------------+----------+" >> ${summary_table_file}
+#			if [ "${runtype}" == "test" ]; then
+#				cleanup_images
+#				cleanup_manifest
+#				exit 1
+#			fi
+#		else
+#			if ((SNYK_ENABLED)); then
+#			echo "#####################################################"
+#			echo "        Scanning with snyk for vulnerabilities       "
+#			echo "#####################################################"
+#				for i in "${!tags[@]}"
+#				do
+#					echo "...scanning ${repo}:${tags[$i]}"
+#					snyk test --docker "${repo}:${tags[$i]}" --file="${dockerfile}"
+#				done
+#			fi
+#			echo "| ${image_name:0:80}${auto_space_line:0:$((76 - ${#image_name}))} | success  |" >> ${summary_table_file}
+#			echo "+------------------------------------------------------------------------------+----------+" >> ${summary_table_file}
+#		fi
+#
+#		docker buildx rm mbuilder
+#	else
 		# shellcheck disable=SC2086 # ignoring ${tags} due to whitespace problem
 		if ! docker build --pull --no-cache ${expanded_tags} -f "${dockerfile}" . ; then
 			echo "#############################################"
@@ -304,7 +304,7 @@ function build_image() {
 			echo "| ${image_name:0:80}${auto_space_line:0:$((76 - ${#image_name}))} | success  |" >> ${summary_table_file}
 			echo "+------------------------------------------------------------------------------+----------+" >> ${summary_table_file}
 		fi
-	fi
+#	fi
 }
 
 # Build the docker image for a given VM, OS, BUILD and BUILD_TYPE combination.
